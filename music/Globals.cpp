@@ -23,6 +23,8 @@ char* G::playlist_input = (char*)malloc(sizeof(char) * 32);
 
 HHOOK G::_k_hook;
 
+bool G::showInfo = false;
+
 void G::ResourceCleanUp() {
 
     ImGui::SFML::Shutdown();
@@ -47,6 +49,29 @@ void G::ResourceCleanUp() {
     if (_k_hook) {
         UnhookWindowsHookEx(_k_hook);
     }
+}
+
+void G::NextSong()
+{
+    Song next = Playlist::getSong(G::playlists, Where::NEXT, G::songState);
+    G::currentSong->stop();
+    G::currentSong = next.music;
+    G::currentSong->play();
+    G::currentSongName = next.name;
+}
+
+void G::PrevSong() {
+    Song prev = Playlist::getSong(G::playlists, Where::PREV, G::songState);
+    G::currentSong->stop();
+    G::currentSong = prev.music;
+    G::currentSong->play();
+    G::currentSongName = prev.name;
+}
+
+void G::CreatePlaylist(char* name) {
+    std::filesystem::create_directory("Songs\\" + std::string(name));
+    memset(name, 0, 32);
+    Playlist::refreshSongs(G::playlists);
 }
 
 void G::UpdateCurrentSong()
@@ -97,4 +122,28 @@ LRESULT __stdcall G::k_Callback1(int nCode, WPARAM wParam, LPARAM lParam)
     }
 
     return CallNextHookEx(NULL, nCode, wParam, lParam);
+}
+
+void G::AddSong(char* playlist, char* link)
+{
+    std::string command = ".\\youtube-dl.exe --extract-audio --audio-format vorbis -o \"" + G::currentPath + "/Songs/" + std::string(playlist) + "/%(title)s.%(ext)s" + "\" " + std::string(link);
+    std::cout << command << std::endl;
+    G::ytdl_thread = std::thread([command]() {
+        system(command.c_str());
+        Playlist::refreshSongs(G::playlists);
+        std::cout << "done downloading" << std::endl;
+        G::ytdl_thread.detach();
+    });
+}
+
+void G::PlaySong(size_t i, size_t k)
+{
+    G::currentSong->stop();
+    G::currentSong = G::playlists[i].songs[k].music;
+    G::currentSongName = G::playlists[i].songs[k].name;
+    G::currentSong->play();
+    G::pause = false;
+    G::hasPlayed = true;
+    G::songState.playlist_index = i;
+    G::songState.song_index = k;
 }

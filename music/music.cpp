@@ -51,6 +51,9 @@ int main()
         // playlists
         GUI::DrawPlaylists();
 
+        // info
+        GUI::DrawInfo();
+
         // update volume, song, etc
         G::UpdateCurrentSong();
 

@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <vector>
 #include <string>
+#include <iostream>
 
 #include "Playlist.h"
 
@@ -35,9 +36,19 @@ public:
 
     static HHOOK _k_hook;
 
+    static bool showInfo;
+
     static void ResourceCleanUp();
     static void UpdateCurrentSong();
+
+    static void NextSong();
+    static void PrevSong();
+
+    static void CreatePlaylist(char* name);
+    static void AddSong(char* playlist, char* link);
     
+    static void PlaySong(size_t playlist_index, size_t song_index);
+
     // handle weird key presses
     static LRESULT __stdcall k_Callback1(int nCode, WPARAM wParam, LPARAM lParam);
 };

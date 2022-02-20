@@ -7,6 +7,7 @@
 class GUI
 {
 public:
+	static void DrawInfo();
 	static void DrawControls();
 	static void DrawPlaylists();
 };
