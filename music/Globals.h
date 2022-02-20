@@ -5,58 +5,39 @@
 
 #include <thread>
 #include <windows.h>
+#include <vector>
+#include <string>
 
 #include "Playlist.h"
 
-namespace Globals {
-	std::vector<Playlist> playlists;
-	size_t playlist_index;
-	size_t song_index;
+class G {
+public:
+    static std::vector<Playlist> playlists;
+    static SongState songState;
 
-	sf::Music* currentSong = new sf::Music();
-	std::string currentSongName = "None";
-    std::string currentPath = std::filesystem::current_path().string();
+    static sf::Music* currentSong;
+    static std::string currentSongName;
+    static std::string currentPath;
 
-	bool loop = false;
-	bool loopSong = false;
-	bool pause = false;
-	bool hasPlayed = false;
+    static bool pause;
+    static bool hasPlayed;
 
-	bool createPlaylist = false;
-	bool addSong = false;
-	int volume = 50;
-	bool checkSongEvent = false;
+    static bool createPlaylist;
+    static bool addSong;
+    static int volume;
+    static bool checkSongEvent;
 
-    std::thread ytdl_thread;
-    std::thread song_event_thread;
+    static std::thread ytdl_thread;
+    static std::thread song_event_thread;
 
-    char* yt_link = (char*)malloc(sizeof(char) * 128);
-    char* playlist_input = (char*)malloc(sizeof(char) * 32);
+    static char* yt_link;
+    static char* playlist_input;
+
+    static HHOOK _k_hook;
+
+    static void ResourceCleanUp();
+    static void UpdateCurrentSong();
     
-    HHOOK _k_hook;
-
-	void ResourceCleanUp() {
-        ImGui::SFML::Shutdown();
-
-        for (Playlist& p : playlists) {
-            for (Song s : p.songs) {
-                delete s.music;
-            }
-        }
-
-        if (song_event_thread.joinable()) {
-            song_event_thread.join();
-        }
-        if (ytdl_thread.joinable()) {
-            ytdl_thread.join();
-        }
-
-        delete currentSong;
-        free(playlist_input);
-        free(yt_link);
-
-        if (_k_hook) {
-            UnhookWindowsHookEx(_k_hook);
-        }
-	}
-}
+    // handle weird key presses
+    static LRESULT __stdcall k_Callback1(int nCode, WPARAM wParam, LPARAM lParam);
+};

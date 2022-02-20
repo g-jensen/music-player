@@ -21,28 +21,28 @@ void Playlist::refreshSongs(std::vector<Playlist>& playlists)
     }
 }
 
-Song Playlist::getSong(std::vector<Playlist>& playlists, Where w, bool loop, bool loopSong, size_t playlist_index, size_t song_index)
+Song Playlist::getSong(std::vector<Playlist>& playlists, Where w, SongState &songState)
 {
-    if (loopSong) { return playlists[playlist_index].songs[song_index]; }
+    if (songState.loopSong) { return playlists[songState.playlist_index].songs[songState.song_index]; }
     if (w == Where::NEXT) {
-        if (song_index >= playlists[playlist_index].songs.size() - 1) {
-            if (loop) {
-                song_index = 0;
+        if (songState.song_index >= playlists[songState.playlist_index].songs.size() - 1) {
+            if (songState.loop) {
+                songState.song_index = 0;
             }
         }
         else {
-            song_index++;
+            songState.song_index++;
         }
     }
     else {
-        if (song_index <= 0) {
-            if (loop) {
-                song_index = playlists[playlist_index].songs.size() - 1;
+        if (songState.song_index <= 0) {
+            if (songState.loop) {
+                songState.song_index = playlists[songState.playlist_index].songs.size() - 1;
             }
         }
         else {
-            song_index--;
+            songState.song_index--;
         }
     }
-    return playlists[playlist_index].songs[song_index];
+    return playlists[songState.playlist_index].songs[songState.song_index];
 }
