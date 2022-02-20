@@ -53,19 +53,23 @@ void G::ResourceCleanUp() {
 
 void G::NextSong()
 {
-    Song next = Playlist::getSong(G::playlists, Where::NEXT, G::songState);
-    G::currentSong->stop();
-    G::currentSong = next.music;
-    G::currentSong->play();
-    G::currentSongName = next.name;
+    if (playlists.size() > 0) {
+        Song next = Playlist::getSong(G::playlists, Where::NEXT, G::songState);
+        G::currentSong->stop();
+        G::currentSong = next.music;
+        G::currentSong->play();
+        G::currentSongName = next.name;
+    }
 }
 
 void G::PrevSong() {
-    Song prev = Playlist::getSong(G::playlists, Where::PREV, G::songState);
-    G::currentSong->stop();
-    G::currentSong = prev.music;
-    G::currentSong->play();
-    G::currentSongName = prev.name;
+    if (playlists.size() > 0) {
+        Song prev = Playlist::getSong(G::playlists, Where::PREV, G::songState);
+        G::currentSong->stop();
+        G::currentSong = prev.music;
+        G::currentSong->play();
+        G::currentSongName = prev.name;
+    }
 }
 
 void G::CreatePlaylist(char* name) {
