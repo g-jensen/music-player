@@ -11,6 +11,9 @@
 
 #include "Playlist.h"
 
+#include "discord_rp/discord_rpc.h"
+#include "discord_rp/discord_register.h"
+
 class G {
 public:
     static std::vector<Playlist> playlists;
@@ -38,6 +41,8 @@ public:
 
     static bool showInfo;
 
+    static DiscordRichPresence discordPresence;
+
     static void ResourceCleanUp();
     static void UpdateCurrentSong();
 
@@ -47,6 +52,7 @@ public:
     static void CreatePlaylist(char* name);
     static void AddSong(char* playlist, char* link);
     
+    static void PlaySong(Song& song);
     static void PlaySong(size_t playlist_index, size_t song_index);
 
     // handle weird key presses

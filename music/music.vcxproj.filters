@@ -89,5 +89,11 @@
     <ClInclude Include="SongState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="discord_rp\discord_register.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="discord_rp\discord_rpc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

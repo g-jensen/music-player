@@ -25,6 +25,8 @@ HHOOK G::_k_hook;
 
 bool G::showInfo = false;
 
+DiscordRichPresence G::discordPresence;
+
 void G::ResourceCleanUp() {
 
     ImGui::SFML::Shutdown();
@@ -55,20 +57,14 @@ void G::NextSong()
 {
     if (playlists.size() > 0) {
         Song next = Playlist::getSong(G::playlists, Where::NEXT, G::songState);
-        G::currentSong->stop();
-        G::currentSong = next.music;
-        G::currentSong->play();
-        G::currentSongName = next.name;
+        G::PlaySong(next);
     }
 }
 
 void G::PrevSong() {
     if (playlists.size() > 0) {
         Song prev = Playlist::getSong(G::playlists, Where::PREV, G::songState);
-        G::currentSong->stop();
-        G::currentSong = prev.music;
-        G::currentSong->play();
-        G::currentSongName = prev.name;
+        G::PlaySong(prev);
     }
 }
 
@@ -83,11 +79,7 @@ void G::UpdateCurrentSong()
     if (hasPlayed) {
         if (currentSong != nullptr) {
             if (currentSong->getStatus() == sf::Music::Status::Stopped) {
-                Song next = Playlist::getSong(playlists, Where::NEXT, G::songState);
-                currentSong->stop();
-                currentSong = next.music;
-                currentSong->play();
-                currentSongName = next.name;
+                G::NextSong();
             }
             currentSong->setVolume(volume);
             if (pause && currentSong->getStatus() != sf::Music::Status::Paused) {
@@ -112,6 +104,7 @@ LRESULT __stdcall G::k_Callback1(int nCode, WPARAM wParam, LPARAM lParam)
             G::currentSong = next.music;
             G::currentSong->play();
             G::currentSongName = next.name;
+            G::PlaySong(G::songState.playlist_index, G::songState.song_index + 1);
         }
         else if (key->vkCode == VK_MEDIA_PREV_TRACK && G::hasPlayed) {
             Song prev = Playlist::getSong(G::playlists, Where::PREV, G::songState);
@@ -140,6 +133,18 @@ void G::AddSong(char* playlist, char* link)
     });
 }
 
+void G::PlaySong(Song &song) {
+    G::currentSong->stop();
+    G::currentSong = song.music;
+    G::currentSong->play();
+    G::currentSongName = song.name;
+
+    G::discordPresence.startTimestamp = std::time(0);
+    G::discordPresence.details = song.name.c_str();
+    G::discordPresence.largeImageKey = "images_large_";
+    Discord_UpdatePresence(&G::discordPresence);
+}
+
 void G::PlaySong(size_t i, size_t k)
 {
     G::currentSong->stop();
@@ -150,4 +155,10 @@ void G::PlaySong(size_t i, size_t k)
     G::hasPlayed = true;
     G::songState.playlist_index = i;
     G::songState.song_index = k;
+
+    G::discordPresence.startTimestamp = std::time(0);
+    G::discordPresence.details = G::playlists[i].songs[k].name.c_str();
+    G::discordPresence.largeImageKey = "images_large_";
+    Discord_UpdatePresence(&G::discordPresence);
+
 }
