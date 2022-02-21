@@ -4,8 +4,6 @@
 #include <ctime>
 
 #include "GUI.h"
-#include "discord_rp/discord_rpc.h"
-#include "discord_rp/discord_register.h"
 
 int main()
 {

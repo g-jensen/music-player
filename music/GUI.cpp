@@ -40,7 +40,16 @@ void GUI::DrawControls()
 {
     ImGui::Begin("Controls");
     ImGui::Text("Current Song: %s", G::currentSongName.c_str());
-    ImGui::ProgressBar(G::currentSong->getPlayingOffset().asSeconds() / G::currentSong->getDuration().asSeconds(), ImVec2(0, 0.5));
+
+    ImGui::ProgressBar(G::currentSong->getPlayingOffset() / G::currentSong->getDuration(),ImVec2(0,0.5));
+    
+    if (ImGui::SmallButton("-5 sec") && G::currentSong->getPlayingOffset().asSeconds() > 5) {
+        G::currentSong->setPlayingOffset(sf::seconds(G::currentSong->getPlayingOffset().asSeconds() - 5));
+    }
+    ImGui::SameLine();
+    if (ImGui::SmallButton("+5 sec") && G::currentSong->getPlayingOffset().asSeconds() < G::currentSong->getDuration().asSeconds() - 5) {
+        G::currentSong->setPlayingOffset(sf::seconds(G::currentSong->getPlayingOffset().asSeconds() + 5));
+    }
 
     if (ImGui::Button("Refresh Songs")) {
         Playlist::refreshSongs(G::playlists);
@@ -58,7 +67,7 @@ void GUI::DrawControls()
         ImGui::TreePop();
     }
     ImGui::Checkbox("Pause", &G::pause);
-
+    
 
     if (ImGui::Button("Prev Song")) {
         G::PrevSong();
@@ -101,9 +110,20 @@ void GUI::DrawPlaylists()
     for (size_t i = 0; i < G::playlists.size(); i++) {
         if (ImGui::TreeNode(G::playlists[i].name.c_str())) {
             for (size_t k = 0; k < G::playlists[i].songs.size(); k++) {
-                ImGui::Bullet(); if (ImGui::SmallButton(G::playlists[i].songs[k].name.c_str())) {
-                    G::PlaySong(i,k);
-                };
+
+                if (G::currentSong == G::playlists[i].songs[k].music) {
+                    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(7.0f, 0.6f, 0.6f));
+                    ImGui::Bullet(); if (ImGui::SmallButton(G::playlists[i].songs[k].name.c_str())) {
+                        G::PlaySong(i, k);
+                    };
+                    ImGui::PopStyleColor(1);
+                }
+                else {
+                    ImGui::Bullet(); if (ImGui::SmallButton(G::playlists[i].songs[k].name.c_str())) {
+                        G::PlaySong(i, k);
+                    };
+                }
+
             }
             ImGui::TreePop();
         }
